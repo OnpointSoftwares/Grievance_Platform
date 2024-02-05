@@ -8,45 +8,87 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
+            padding: 0;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidenav {
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #007bff;
+            padding-top: 20px;
+        }
+
+        .sidenav a {
+            padding: 15px 8px 15px 32px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #ffffff;
+            display: block;
+        }
+
+        .sidenav a:hover {
+            background-color: #0056b3;
+            color: #ffffff;
+        }
+
+        .container {
+            margin-left: 250px;
             padding: 20px;
+        }
+
+        #result {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="mt-4 mb-4">Grievance System</h1>
-        
-        <form id="grievanceForm">
-            <div class="mb-3">
-                <label for="grievance_text" class="form-label">Enter your grievance:</label>
-                <textarea id="grievance_text" name="grievance_text" class="form-control" rows="4" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Submit Grievance</button>
-        </form>
 
-        <div id="result" class="mt-4"></div>
-    </div>
+<div class="sidenav">
+    <a href="#">Home</a>
+    <a href="#">Submit Grievance</a>
+    <a href="#">View Details</a>
+</div>
 
-    <!-- Bootstrap JS and Popper.js (Optional) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.getElementById('grievanceForm').addEventListener('submit', function (event) {
-            event.preventDefault();
+<div class="container">
+    <h1 class="mt-4 mb-4">Grievance System</h1>
+    
+    <form id="grievanceForm">
+        <div class="mb-3">
+            <label for="grievance_text" class="form-label">Enter your grievance:</label>
+            <textarea id="grievance_text" name="grievance_text" class="form-control" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Grievance</button>
+    </form>
 
-            const formData = new FormData(event.target);
+    <div id="result"></div>
+</div>
 
-            fetch('/submit_grievance', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('result').innerHTML = `<div class="alert alert-info" role="alert">${data.result}</div>`;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+<!-- Bootstrap JS and Popper.js (Optional) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('grievanceForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const formData = new FormData(event.target);
+
+        fetch('/submit_grievance', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('result').innerHTML = `<div class="alert alert-info" role="alert">${data.result}</div>`;
+        })
+        .catch(error => {
+            console.error('Error:', error);
         });
-    </script>
+    });
+</script>
 </body>
 </html>

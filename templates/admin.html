@@ -1,138 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <!-- Head content -->
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        /* Custom styles for this template */
         body {
-            background-color: #f8f9fa;
+            font-size: 0.875rem;
         }
 
-        .container {
-            background-color: #ffffff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 50px;
+        .feather {
+            width: 16px;
+            height: 16px;
+            vertical-align: text-bottom;
         }
 
-        .card-header {
+        .navbar {
             background-color: #007bff;
             color: #ffffff;
-            text-align: center;
-            padding: 10px;
-            border-radius: 10px 10px 0 0;
         }
 
-        .card-body {
-            padding: 20px;
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
         }
 
-        .logout-btn {
+        .sidebar {
+            position: fixed;
+            top: 56px; /* Height of the navbar */
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+            padding: 0;
+            background-color: #007bff; /* Updated background color */
+            color: #ecf0f1; /* Updated text color */
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-sticky {
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+
+        .sidebar .nav-link {
+            font-weight: 500;
+            color: #ecf0f1; /* Updated text color */
+        }
+
+        .sidebar .nav-link.active {
+            background-color: #2c3e50; /* Updated background color */
+            color: #ffffff;
+        }
+
+        .main-content {
             margin-top: 20px;
         }
 
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
+        .welcome-message {
+            margin-bottom: 20px;
+        }
+
+        .table-container {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h2<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-
-        .container {
-            background-color: #ffffff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 50px;
-        }
-
-        .card-header {
-            background-color: #007bff;
-            color: #ffffff;
-            text-align: center;
-            padding: 10px;
-            border-radius: 10px 10px 0 0;
-        }
-
-        .card-body {
-            padding: 20px;
-        }
-
-        .logout-btn {
-            margin-top: 20px;
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h2>Admin Dashboard</h2>
-                </div>
-                <div class="card-body">
-                    <p>Welcome, {{ username }}!</p>
-
-                    <!-- Table to display grievances -->
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Student Name</th>
-                                <th>Grievance Text</th>
-                                <th>Urgency</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for grievance in grievances %}
-                                <tr>
-                                    <td>{{ grievance.id }}</td>
-                                    <td>{{ grievance.student_name }}</td>
-                                    <td>{{ grievance.grievance_text }}</td>
-                                    <td>{{ grievance.urgency }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-
-                    <div class="logout-btn">
-                        <a href="" class="btn btn-primary">Logout</a>
-                    </div>
-                </div>
-            </div>
+<nav class="navbar navbar-expand-md navbar-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('fetch_grievances') }}">Admin Dashboard</a>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Logout</a>
+                </li>
+            </ul>
         </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Side Navigation -->
+        <nav class="col-md-2 d-md-block bg-light sidebar navbar">
+            <div class="sidebar-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('fetch_grievances') }}">
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('add_students') }}">
+                            Add Student
+                        </a>
+                    </li>
+                    <!-- Add more navigation links as needed -->
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 main-content">
+            <h2 class="welcome-message">Admin Dashboard</h2>
+            <p>Welcome, {{ username }}!</p>
+
+            <!-- Table to display grievances -->
+            <div class="table-container">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Student Name</th>
+                            <th>Grievance Text</th>
+                            <th>Urgency</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for grievance in grievances %}
+                            <tr>
+                                <td>{{ grievance.id }}</td>
+                                <td>{{ grievance.student_id }}</td>
+                                <td>{{ grievance.grievance_text }}</td>
+                                <td>{{ grievance.urgency }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </main>
     </div>
 </div>
 
