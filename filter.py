@@ -26,11 +26,10 @@ def save_to_database(grievance_text, student_name, student_id, urgency):
         cursor = connection.cursor()
 
         # Define the SQL query to insert data into the database
-        insert_query = "INSERT INTO grievances (id,student_name, student_id,grievance_text,urgency) VALUES (%s,%s, %s, %s, %s)"
-        random_id = random.randint(1, 100)
+        insert_query = "INSERT INTO grievance_details (student_id,grievace_text,urgency) VALUES (%s, %s, %s)"
         # Values to be inserted into the database
-        values = (int(random_id),student_name, student_id,grievance_text, urgency)
-
+        values = (student_id,grievance_text, urgency)
+        print(values)
         # Execute the query
         cursor.execute(insert_query, values)
 
@@ -64,15 +63,19 @@ def submit_grievance():
 
         # Make prediction
         urgency = model.predict(grievance_text_vectorized)[0]
+        if(urgency==0):
+            urgency_text="not urgent"
+        elif(urgency==1):
+            urgency_text="urgent"
         php_submit_grievance = 'http://localhost/GrievancePlatform/submit_grievance.php'  # Adjust the URL as needed
-        data = {'grievance_text': grievance_text, 'student_name': "username",'student_id':"student_id",'urgency':str(urgency)}
-        saved_to_database = save_to_database(str(grievance_text), "username",int(123), str(urgency))
+        data = {'grievance_text': grievance_text, 'student_name': "username",'student_id':"student_id",'urgency':str(urgency_text)}
+        saved_to_database = save_to_database(str(grievance_text), "username",int(2), str(urgency_text))
 
     if saved_to_database:
         print("Data successfully saved to the database")
     else:
         print("Failed to save data to the database")
-        return jsonify(data)
+    return jsonify(data)
 
 
 @app.route('/')

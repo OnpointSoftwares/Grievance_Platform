@@ -83,7 +83,8 @@
         })
         .then(response => response.json())
         .then(data => {
-            document.getElementById('result').innerHTML = `<div class="alert alert-info" role="alert">${data.urgency}${data.grievance_text}</div>`;
+            document.getElementById('result').innerHTML = `<div class="alert alert-info" role="alert">Grievance saved successfully</div>`;
+            document.getElementById("grievance_text").value="";
         })
         .catch(error => {
             console.error('Error:', error);
