@@ -130,11 +130,15 @@ def login():
                 role = user[3]  # Assuming the role is in the third column of the users table
                 if role == 'admin':
                     return redirect(url_for('fetch_grievances'))
-                else:
-                    return render_template("index.html")
             else:
+                query = "SELECT * FROM student_details WHERE student_email = %s AND password = %s"
+                cursor.execute(query, (username, password))
+                user1 = cursor.fetchone()
+                if user1:
+                    return redirect(url_for('home'))
+                else:
                 # Handle failed login (e.g., show error message)
-                return jsonify({'status': 'error', 'message': 'Invalid username or password'}), 401  # Unauthorized
+                  return jsonify({'status': 'error', 'message': 'Invalid username or password'}), 401  # Unauthorized
 
         except Exception as e:
             # Handle unexpected errors
@@ -144,33 +148,49 @@ def login():
             # Close the database connection
             cursor.close()
             connection.close()
+
 @app.route('/add_student', methods=['POST'])
 def add_student():
     if request.method == 'POST':
-        # Get student details from the form
-        student_name = request.form['studentName']
-        student_id = request.form['studentID']
-
-        # Send a POST request to the PHP file for adding a student
-        php_add_student_url = 'http://localhost/GrievancePlatform/add_student.php'  # Adjust the URL as needed
-        data = {'studentName': student_name, 'studentID': student_id}
-
         try:
-            response = requests.post(php_add_student_url, data=data, timeout=5)
-            response.raise_for_status()
-            result = response.json()
+            # Extract JSON data from the request body
+            data = request.get_json()
 
-            if 'status' in result and 'message' in result:
-                if result['status'] == 'success':
-                    return jsonify(result), 200
-                else:
-                    return jsonify(result), 400
-            else:
-                return jsonify({'status': 'error', 'message': 'Unexpected response format'}), 500
+            # Get student details from the JSON data
+            student_name = data.get('studentName')
+            student_email = data.get('studentEmail')
 
-        except requests.exceptions.RequestException as req_err:
-            return jsonify({'status': 'error', 'message': f'Request Error: {req_err}'}), 500
+            # Validate required fields
+            if not student_name or not student_email:
+                return jsonify({'status': 'error', 'message': 'Missing required fields'}), 400
 
+            # Establish MySQL connection
+            connection = mysql.connector.connect(**db_config)
+
+            # Create a cursor object to execute queries
+            cursor = connection.cursor()
+
+            # Example INSERT query (replace with your actual query)
+            insert_query = "INSERT INTO student_details (student_name, student_email) VALUES (%s, %s)"
+            insert_data = (student_name, student_email)
+
+            # Execute the query
+            cursor.execute(insert_query, insert_data)
+
+            # Commit the changes
+            connection.commit()
+
+            # Close the cursor and connection
+            cursor.close()
+            connection.close()
+
+            return jsonify({'status': 'success', 'message': 'Student added successfully'}), 200
+
+        except mysql.connector.Error as mysql_err:
+            return jsonify({'status': 'error', 'message': f'MySQL Error: {mysql_err}'}), 500
+
+        except Exception as e:
+            return jsonify({'status': 'error', 'message': f'Unexpected Error: {e}'}), 500
 if __name__ == '__main__':
     app.run(debug=True)
     webbrowser.open("127.0.0.1:5000")

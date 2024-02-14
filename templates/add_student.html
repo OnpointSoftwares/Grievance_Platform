@@ -107,8 +107,8 @@
                         <input type="text" class="form-control" id="studentName" name="studentName" required>
                     </div>
                     <div class="mb-3">
-                        <label for="studentID" class="form-label">Student ID:</label>
-                        <input type="text" class="form-control" id="studentID" name="studentID" required>
+                        <label for="studentEmail" class="form-label">Student ID:</label>
+                        <input type="text" class="form-control" id="studentEmail" name="studentEmail" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Add Student</button>
                 </form>
@@ -116,7 +116,36 @@
         </main>
     </div>
 </div>
+<script>
+    document.getElementById('addStudentForm').addEventListener('submit', function (event) {
+        event.preventDefault();
 
+        const studentName = document.getElementById('studentName').value;
+        const studentEmail= document.getElementById('studentEmail').value;
+
+        // Use the Fetch API to send data to the Flask server
+        fetch('http://127.0.0.1:5000/add_student', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                studentName: studentName,
+                studentEmail: studentEmail,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the response from the server
+            console.log(data);
+            alert(data.message);  // Show a message to the user
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Handle errors, show an alert, or log them
+        });
+    });
+</script>
 <!-- Bootstrap JS and Popper.js (Optional) -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
