@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify,url_for,redirect
+from flask import Flask, render_template, request, jsonify,url_for,redirect,session
 import requests
 from requests.exceptions import HTTPError, RequestException
 import webbrowser
@@ -8,12 +8,13 @@ import mysql.connector
 from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
+app.secret_key = 'onpoint@123'
 # Load the trained model
 model = joblib.load('grievance_classifier_model.joblib')
 
 # Load the TF-IDF vectorizer
 vectorizer = joblib.load('tfidf_vectorizer.joblib')
-def save_to_database(grievance_text, student_name, student_id, urgency):
+def save_to_database(grievance_text, student_name, student_username, urgency):
     try:
         # Establish a MySQL connection
         connection = mysql.connector.connect(
@@ -26,9 +27,9 @@ def save_to_database(grievance_text, student_name, student_id, urgency):
         cursor = connection.cursor()
 
         # Define the SQL query to insert data into the database
-        insert_query = "INSERT INTO grievance_details (student_id,grievace_text,urgency) VALUES (%s, %s, %s)"
+        insert_query = "INSERT INTO grievance_details (student_username,grievace_text,urgency) VALUES (%s, %s, %s)"
         # Values to be inserted into the database
-        values = (student_id,grievance_text, urgency)
+        values = (student_username,grievance_text, urgency)
         print(values)
         # Execute the query
         cursor.execute(insert_query, values)
@@ -69,7 +70,7 @@ def submit_grievance():
             urgency_text="urgent"
         php_submit_grievance = 'http://localhost/GrievancePlatform/submit_grievance.php'  # Adjust the URL as needed
         data = {'grievance_text': grievance_text, 'student_name': "username",'student_id':"student_id",'urgency':str(urgency_text)}
-        saved_to_database = save_to_database(str(grievance_text), "username",int(2), str(urgency_text))
+        saved_to_database = save_to_database(str(grievance_text), session['username'],session['username'], str(urgency_text))
 
     if saved_to_database:
         print("Data successfully saved to the database")
@@ -96,7 +97,26 @@ def fetch_grievances():
 
         # Do something with the fetched data
         # For example, return it as JSON in your Flask route
-        return render_template("admin.html",grievances=grievances)
+        return render_template("admin.html",grievances=grievances,username=session['username'])
+    else:
+        # Handle the case when the request was not successful
+        return jsonify({'error': 'Failed to fetch grievances'})
+@app.route('/fetch_student_grievances')
+def fetch_student_grievances():
+    # URL of the PHP file
+    php_url = 'http://localhost/GrievancePlatform/data.php'
+
+    # Make a GET request to the PHP file
+    response = requests.get(php_url)
+
+    # Check if the request was successful (status code 200)
+    if response.status_code == 200:
+        # Parse the JSON response
+        grievances = response.json()
+
+        # Do something with the fetched data
+        # For example, return it as JSON in your Flask route
+        return render_template("student_grievance.html",grievances=grievances,username=session['username'])
     else:
         # Handle the case when the request was not successful
         return jsonify({'error': 'Failed to fetch grievances'})
@@ -135,6 +155,7 @@ def login():
                 cursor.execute(query, (username, password))
                 user1 = cursor.fetchone()
                 if user1:
+                    session['username'] = username
                     return redirect(url_for('home'))
                 else:
                 # Handle failed login (e.g., show error message)
@@ -191,6 +212,43 @@ def add_student():
 
         except Exception as e:
             return jsonify({'status': 'error', 'message': f'Unexpected Error: {e}'}), 500
+
+@app.route('/address_grievance', methods=['POST'])
+def address_grievance():
+    if request.method == 'POST':
+        grievance_id = request.form['grievance_id']
+        
+        # Update your database logic here
+        try:
+            # Establish a connection to the MySQL database
+            connection = mysql.connector.connect(
+                host='localhost',
+                user='root',
+                password='',
+                database='grievance_system'
+            )
+
+            # Create a cursor object to execute SQL queries
+            cursor = connection.cursor()
+
+            # Define the SQL query to update the grievance status to addressed
+            update_query = "UPDATE grievance_details SET status = 'addressed' WHERE id = %s"
+            cursor.execute(update_query, (grievance_id,))
+
+            # Commit the changes to the database
+            connection.commit()
+
+            # Close the cursor and connection
+            cursor.close()
+            connection.close()
+
+            return jsonify({'status': 'success', 'message': 'Grievance addressed successfully'})
+
+        except mysql.connector.Error as e:
+            return jsonify({'status': 'error', 'message': f'MySQL Error: {e}'})
+
+        except Exception as e:
+            return jsonify({'status': 'error', 'message': f'Unexpected Error: {e}'})
 if __name__ == '__main__':
     app.run(debug=True)
     webbrowser.open("127.0.0.1:5000")

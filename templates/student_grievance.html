@@ -57,16 +57,32 @@
 
 <div class="container">
     <h1 class="mt-4 mb-4">Grievance System</h1>
-    
-    <form id="grievanceForm">
-        <div class="mb-3">
-            <label for="grievance_text" class="form-label">Enter your grievance:</label>
-            <textarea id="grievance_text" name="grievance_text" class="form-control" rows="4" required></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit Grievance</button>
-    </form>
-
-    <div id="result"></div>
+<div class="table-container">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Student Name</th>
+                <th>Grievance Text</th>
+                <th>Time</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for grievance in grievances %}
+            {% if grievance.student_username == username %}
+                <tr>
+                    <td>{{ grievance.id }}</td>
+                    <td>{{ grievance.student_username }}</td>
+                    <td>{{ grievance.grievace_text }}</td>
+                    <td>{{ grievance.Time }}</td>
+                    <td>{{ grievance.Status }}</td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 </div>
 
 <!-- Bootstrap JS and Popper.js (Optional) -->
