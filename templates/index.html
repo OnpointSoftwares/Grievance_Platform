@@ -49,11 +49,12 @@
 </head>
 <body>
 
-<div class="sidenav">
-    <a href="#">Home</a>
-    <a href="{{ url_for('home') }}">Submit Grievance</a>
-    <a href="{{ url_for('fetch_student_grievances') }}">View Details</a>
-</div>
+    <div class="sidenav">
+        <a href="{{ url_for('home') }}" class="active">Dashboard</a>
+        <a href="{{ url_for('grievance_form') }}">Submit Grievance</a>
+        <a href="{{ url_for('fetch_student_grievances') }}">View Details</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
 
 <div class="container">
     <h1 class="mt-4 mb-4">Grievance System</h1>
@@ -65,7 +66,6 @@
         </div>
         <button type="submit" class="btn btn-primary">Submit Grievance</button>
     </form>
-
     <div id="result"></div>
 </div>
 

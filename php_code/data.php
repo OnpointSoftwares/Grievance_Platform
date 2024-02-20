@@ -14,7 +14,7 @@
         die("Connection failed: " . $conn->connect_error);
     }
 // Fetch data from the database (replace this with your actual query)
-$query = "SELECT * FROM grievances";
+$query = "SELECT * FROM grievance_details";
 $result = mysqli_query($conn, $query);
 
 // Convert the result to an associative array

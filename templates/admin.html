@@ -117,7 +117,11 @@
                             Add Student
                         </a>
                     </li>
-                    <!-- Add more navigation links as needed -->
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('logout') }}">
+                            Logout
+                        </a>
+                    </li>
                 </ul>
             </div>
         </nav>
@@ -147,7 +151,11 @@
                                 <td>{{ grievance.student_username }}</td>
                                 <td>{{ grievance.grievace_text }}</td>
                                 <td>{{ grievance.urgency }}</td>
-                                <td><button class="btn btn-primary address-btn" data-grievance-id="{{ grievance.id }}">Address</button>
+                                <td>{{ grievance.Status }}</td>
+                                <td>
+                                    {% if grievance.Status=="Submitted" %}
+                                    <button class="btn btn-primary address-btn" data-grievance-id="{{ grievance.id }}">Address</button>
+                                    {% endif %}
                                 </td>
                             </tr>
                             {% endif %}
@@ -174,7 +182,12 @@
                                 <td>{{ grievance.student_username }}</td>
                                 <td>{{ grievance.grievace_text }}</td>
                                 <td>{{ grievance.urgency }}</td>
-                                <td><button class="btn btn-primary address-btn" data-grievance-id="{{ grievance.id }}">Address</button>                                </td>
+                                <td>{{ grievance.Status }}</td>
+                                <td>
+                                    {% if grievance.Status=="Submitted" %}
+                                    <button class="btn btn-primary address-btn" data-grievance-id="{{ grievance.id }}">Address</button>
+                                    {% endif %}
+                                </td>
                             </tr>
                             {% endif %}
                         {% endfor %}
@@ -196,6 +209,7 @@
                 data: { 'grievance_id': grievanceId },
                 success: function(response) {
                     // Handle the success response
+                location.replace("/fetch_grievances")
                     alert(response.message);
                     // You can also update the UI as needed
                 },
@@ -210,7 +224,6 @@
 
 <!-- Bootstrap JS and Popper.js (Optional) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 

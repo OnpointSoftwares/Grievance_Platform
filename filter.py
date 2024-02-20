@@ -14,6 +14,26 @@ model = joblib.load('grievance_classifier_model.joblib')
 
 # Load the TF-IDF vectorizer
 vectorizer = joblib.load('tfidf_vectorizer.joblib')
+def getUserDetails(username):
+    # Establish MySQL connection
+       # Establish a connection to the MySQL database
+        connection = mysql.connector.connect(**db_config)
+        cursor = connection.cursor()
+        try:
+            # Execute a query to check the login credentials
+            query = "SELECT * FROM student_details WHERE student_email = %s"
+            cursor.execute(query, (username))
+            user = cursor.fetchall()
+            print(username)
+            return jsonify({"id":username}), 500
+        except Exception as e:
+            # Handle unexpected errors
+            return jsonify({'status': 'error', 'message': f'Unexpected Error: {e}'}), 500
+
+        finally:
+            # Close the database connection
+            cursor.close()
+            connection.close()
 def save_to_database(grievance_text, student_name, student_username, urgency):
     try:
         # Establish a MySQL connection
@@ -52,7 +72,24 @@ def add_students():
     return render_template("add_student.html")
 @app.route('/form')
 def home():
-    return render_template('index.html')
+    connection = mysql.connector.connect(**db_config)
+    cursor = connection.cursor()
+    try:
+        # Execute a query to check the login credentials
+        query = "SELECT * FROM student_details WHERE student_email = %s"
+        cursor.execute(query, (session['username'],))
+        user = cursor.fetchall()
+        print(session['username'])
+        column_names = [desc[0] for desc in cursor.description]
+        user_details_list = [dict(zip(column_names, row)) for row in user]
+        return render_template('dashboard.html', userdetails=user_details_list, username=session['username'])
+    except Exception as e:
+        # Handle unexpected errors
+        return jsonify({'status': 'error', 'message': f'Unexpected Error: {e}'}), 500
+    finally:
+        # Close the database connection
+        cursor.close()
+        connection.close()
 
 @app.route('/submit_grievance', methods=['POST'])
 def submit_grievance():
@@ -78,10 +115,19 @@ def submit_grievance():
         print("Failed to save data to the database")
     return jsonify(data)
 
-
+@app.route("/grievance_form")
+def grievance_form():
+       return render_template("index.html")
 @app.route('/')
 def index():
     return render_template('login.html')
+@app.route("/logout")
+def logout():
+    if session['username']!="":
+        session['username']=""
+        return redirect(url_for("index"))
+    else:
+        return redirect(url_for("index"))
 @app.route('/fetch_grievances')
 def fetch_grievances():
     # URL of the PHP file
@@ -149,6 +195,7 @@ def login():
                 # Handle successful login (redirect, set session, etc.)
                 role = user[3]  # Assuming the role is in the third column of the users table
                 if role == 'admin':
+                    session['username'] = username
                     return redirect(url_for('fetch_grievances'))
             else:
                 query = "SELECT * FROM student_details WHERE student_email = %s AND password = %s"
@@ -249,6 +296,7 @@ def address_grievance():
 
         except Exception as e:
             return jsonify({'status': 'error', 'message': f'Unexpected Error: {e}'})
+
 if __name__ == '__main__':
     app.run(debug=True)
     webbrowser.open("127.0.0.1:5000")
