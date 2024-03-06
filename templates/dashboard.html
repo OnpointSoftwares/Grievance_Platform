@@ -49,12 +49,13 @@
 </head>
 <body>
 
-<div class="sidenav">
-    <a href="{{ url_for('home') }}" class="active">Dashboard</a>
-    <a href="{{ url_for('grievance_form') }}">Submit Grievance</a>
-    <a href="{{ url_for('fetch_student_grievances') }}">View Details</a>
-    <a href="{{ url_for('logout') }}">Logout</a>
-</div>
+    <div class="sidenav">
+        <a href="{{ url_for('home') }}" class="active">Dashboard</a>
+        <a href="{{ url_for('grievance_form') }}">Submit Grievance</a>
+        <a href="{{ url_for('fetch_student_grievances') }}">View Details</a>
+        <a href="{{ url_for('update') }}">Update Password</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
 
 <div class="container">
     <h1 class="mt-4 mb-4">Student Dashboard</h1>

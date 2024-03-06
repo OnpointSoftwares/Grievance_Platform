@@ -259,7 +259,9 @@ def add_student():
 
         except Exception as e:
             return jsonify({'status': 'error', 'message': f'Unexpected Error: {e}'}), 500
-
+@app.route('/update')
+def update():
+    return render_template("update_password.html")
 @app.route('/address_grievance', methods=['POST'])
 def address_grievance():
     if request.method == 'POST':
@@ -296,6 +298,45 @@ def address_grievance():
 
         except Exception as e:
             return jsonify({'status': 'error', 'message': f'Unexpected Error: {e}'})
+@app.route('/update_password', methods=['POST'])
+def update_password():
+    if request.method == 'POST':
+        try:
+            # Get the new password and username from the JSON data
+            data = request.json
+            new_password = data.get('newPassword')
+            username = session.get('username')  # Assuming the username is stored in the session after login
+
+            if not new_password or not username:
+                return jsonify({'status': 'error', 'message': 'Missing required fields'}), 400
+
+            # Establish a connection to the MySQL database
+            connection = mysql.connector.connect(**db_config)
+            cursor = connection.cursor()
+
+            try:
+                # Update the user's password in the database
+                update_query = "UPDATE student_details SET password = %s WHERE student_email = %s"
+                cursor.execute(update_query, (new_password, username))
+
+                # Commit the changes to the database
+                connection.commit()
+
+                return jsonify({'status': 'success', 'message': 'Password updated successfully'})
+
+            except mysql.connector.Error as e:
+                return jsonify({'status': 'error', 'message': f'MySQL Error: {e}'})
+
+            except Exception as e:
+                return jsonify({'status': 'error', 'message': f'Unexpected Error: {e}'})
+
+            finally:
+                # Close the database connection
+                cursor.close()
+                connection.close()
+
+        except Exception as e:
+            return jsonify({'status': 'error', 'message': f'Unexpected Error: {e}'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
